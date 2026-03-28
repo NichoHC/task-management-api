@@ -4,7 +4,7 @@ interface User {
 
   nombre: string;
   email: string;
-  password: string;
+  contrasena: string;
 }
 
 export const userSchema: JSONSchemaType<User> = {
@@ -12,8 +12,8 @@ export const userSchema: JSONSchemaType<User> = {
   properties: {
     nombre: { type: "string", minLength: 2, maxLength: 100 },
     email: { type: "string", format: "email" },
-    password: { type: "string", minLength: 6 }
+    contrasena: { type: "string", minLength: 6 }
   },
-  required: ["nombre", "email", "password"],
+  required: ["nombre", "email", "contrasena"],
   additionalProperties: false
 };

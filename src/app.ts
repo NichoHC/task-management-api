@@ -1,11 +1,8 @@
 import express, { Request, Response } from 'express';
-
+import authRoutes from './api/routes/auth.routes';
 const app = express();
 
 app.use(express.json());
-
-app.get('/ping', (_req: Request, res: Response) => {
-  res.send('pong');
-});
+app.use(authRoutes);
 
 export default app;
