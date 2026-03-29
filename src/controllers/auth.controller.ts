@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { hashPassword } from "../services/auth.service";
+import { comparePassword, hashPassword } from "../services/auth.service";
 import pool from "../persistence/database"
+import { generateToken } from "../utils/jwt";
 
 export const register = async (req: Request, res: Response) => {
   const { nombre, email, contrasena } = req.body;
@@ -13,7 +14,7 @@ export const register = async (req: Request, res: Response) => {
       "INSERT INTO usuarios (nombre, email, contrasena) VALUES ($1, $2, $3) RETURNING id, nombre, email",
       [nombre, email, hashedPassword]
     );
-    
+
     const newUser = result.rows[0];
 
     return res.status(201).json({
@@ -32,4 +33,32 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = (_req: any, _res: any) =>   _res.send("User logged in successfully");
+export const login =  async (req: Request, res: Response) =>   {
+    const { email, contrasena } = req.body;
+    try {
+        const result = await pool.query(
+            "SELECT * FROM usuarios WHERE email = $1",
+            [email]
+        );
+
+        const user = result.rows[0];
+        
+        if (!user) {
+            return res.status(400).json({ message: "Invalid email or password" });
+        }
+
+        const isMatch = await comparePassword(contrasena, user.contrasena);
+
+        if (!isMatch) {
+        return res.status(400).json({ message: "Invalid email or password" });
+        }
+        
+
+        const token = generateToken(user.id);
+        res.cookie("token", token);
+        return res.status(200).json({ message: "Login successful" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
