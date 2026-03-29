@@ -1,9 +1,31 @@
 import { Request, Response } from "express";
+import pool from "../persistence/database";
 
 export const getTasks = (req: Request, res: Response) => {
     res.send("Get all tasks");
 }
 export const getTaskById = (req: Request, res: Response) => {}
-export const createTask = (req: Request, res: Response) => {}
+export const createTask = async (req: Request, res: Response) => {
+     const { titulo, descripcion, fecha_vencimiento, estado } = req.body;
+     const userId = (req as any).user.userId;
+
+    try{
+        const result = await pool.query(
+            "INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, estado, usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            [titulo, descripcion, fecha_vencimiento, estado, userId]
+        )
+
+        const newTask = result.rows[0];
+
+        return res.status(201).json({
+            message: "Task created successfully",
+            data: newTask
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error creating task" });
+
+    }
+}
 export const updateTask = (req: Request, res: Response) => {}
 export const deleteTask = (req: Request, res: Response) => {}
