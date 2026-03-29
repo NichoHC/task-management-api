@@ -13,7 +13,7 @@ export const register = async (req: Request, res: Response) => {
       "INSERT INTO usuarios (nombre, email, contrasena) VALUES ($1, $2, $3) RETURNING id, nombre, email",
       [nombre, email, hashedPassword]
     );
-
+    
     const newUser = result.rows[0];
 
     return res.status(201).json({
