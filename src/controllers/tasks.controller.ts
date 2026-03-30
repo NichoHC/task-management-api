@@ -16,7 +16,26 @@ export const getTasks = (req: Request, res: Response) => {
         res.status(500).json({ error: "Error retrieving tasks" });
     });
 }
-export const getTaskById = (req: Request, res: Response) => {}
+export const getTaskById = (req: Request, res: Response) => {
+    
+    const { id } = req.params;
+    const userId = (req as any).user.userId;
+    pool.query(
+        "SELECT * FROM tareas WHERE id = $1 AND usuario_id = $2",
+        [id, userId]
+    ).then(result => {
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+        res.status(200).json({
+            message: "Task retrieved successfully",
+            data: result.rows[0]
+        });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).json({ error: "Error retrieving task" });
+    });
+}
 export const createTask = async (req: Request, res: Response) => {
      const { titulo, descripcion, fecha_vencimiento, estado } = req.body;
      const userId = (req as any).user.userId;
