@@ -2,7 +2,19 @@ import { Request, Response } from "express";
 import pool from "../persistence/database";
 
 export const getTasks = (req: Request, res: Response) => {
-    res.send("Get all tasks");
+    const userId = (req as any).user.userId;
+    pool.query(
+        "SELECT * FROM tareas WHERE usuario_id = $1",
+        [userId]
+    ).then(result => {
+        res.status(200).json({
+            message: "Tasks retrieved successfully",
+            data: result.rows
+        });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).json({ error: "Error retrieving tasks" });
+    });
 }
 export const getTaskById = (req: Request, res: Response) => {}
 export const createTask = async (req: Request, res: Response) => {
