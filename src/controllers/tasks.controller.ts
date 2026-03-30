@@ -79,4 +79,20 @@ export const updateTask = (req: Request, res: Response) => {
             res.status(500).json({ error: "Error updating task" });
         });
 }
-export const deleteTask = (req: Request, res: Response) => {}
+export const deleteTask = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const userId = (req as any).user.userId;
+    pool.query("DELETE FROM tareas WHERE id = $1 AND usuario_id = $2 RETURNING *", [id, userId])
+        .then(result => {
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: "Task not found" });
+            }
+            res.status(200).json({
+                message: "Task deleted successfully",
+                data: result.rows[0]
+            });
+        }).catch(error => {
+            console.error(error);
+            res.status(500).json({ error: "Error deleting task" });
+        });
+}
