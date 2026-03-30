@@ -132,7 +132,7 @@ Todas las rutas están protegidas y solo el dueño puede acceder.
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <tu-repo>
+git clone <(https://github.com/NichoHC/task-management-api)>
 cd task-management-api
 ```
 
